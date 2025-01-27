@@ -3,6 +3,7 @@ from http.client import responses
 from django.core.serializers import serialize
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -97,15 +98,15 @@ class movie_list(APIView):
     def get(self, request):
         movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = MovieSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'success': True})
+            return Response({'success': True}, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class movie_detail(APIView):
@@ -121,27 +122,27 @@ class movie_detail(APIView):
     def get(self, request, pk):
         movie=self.get_object(pk)
         serializer=MovieSerializer(movie)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self,request, pk):
         movie = self.get_object(pk)
         serializer = MovieSerializer(movie, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'success': True})
+            return Response({'success': True}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, pk):
         movie = self.get_object(pk)
         serializer = MovieSerializer(movie, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({'success': True})
+            return Response({'success': True}, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         movie=self.get_object(pk)
         movie.delete()
-        return Response({'success':True})
+        return Response({'success':True}, status=status.HTTP_204_NO_CONTENT)

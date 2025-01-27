@@ -25,3 +25,41 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model=Movie
         fields=['id', 'name', 'description', 'active']
+
+    #field level validations
+
+    def validate_name(self,value):
+        not_allowed_char = ['*', '#', '@', '+', '&', '%', '/', '{', '}', '[', ']']
+
+        if len(value)<2:
+            raise serializers.ValidationError("Movie name must contain at least 2 characters!")
+        if any(char in value for char in not_allowed_char):
+            raise serializers.ValidationError("Movie name must not contain any special characters")
+        if not value[0].isupper():
+            raise serializers.ValidationError("First letter of name must be uppercase")
+        if Movie.objects.filter(name__iexact=value).exists():
+            raise serializers.ValidationError("Movie with this name already exist.")
+        return value
+
+    def validate_detail(self, value):
+        if len(value) < 10:
+            raise serializers.ValidationError("Movie description must contain at least 10 characters!")
+        return value
+
+    def validate(self, attrs):
+        banned_words=['bugger', 'bullshit', 'bastard', 'crap', 'dammit', 'damn',
+                        'damned', 'damn it', 'god dammit', 'goddammit', 'God damn', 'god damn', 'goddamn',                                                                    'Goddamn', 'goddamned',
+                        'goddamnit', 'godsdamn', 'hell', 'holy shit''horseshit',
+                        'in shit', 'nigga', 'nigra', 'Jesus Christ', 'shit', ]
+
+        if attrs['name'].lower().strip()==attrs['description'].lower().strip():
+            raise serializers.ValidationError("name and description must not be same")
+
+        for word in banned_words:
+            if word in attrs['name'].lower().strip() or word in attrs['description'.lower().strip()]:
+                raise serializers.ValidationError("Movie name or description contains improper words")
+        return attrs
+
+
+
+
