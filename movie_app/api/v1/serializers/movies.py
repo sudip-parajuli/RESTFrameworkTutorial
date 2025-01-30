@@ -76,12 +76,6 @@ class MovieSerializer(serializers.ModelSerializer):
 
 """creating WatchList serializer and StreamPlatform serializer"""
 
-class StreamPlatformSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=StreamPlatform
-        fields='__all__'
-
-
 class WatchListSerializer(serializers.ModelSerializer):
     status=serializers.SerializerMethodField() #implemented custom serializer field
     class Meta:
@@ -92,5 +86,14 @@ class WatchListSerializer(serializers.ModelSerializer):
         if obj.active:
             return "Running successfully!"
         return "Not Available!"
+
+class StreamPlatformSerializer(serializers.ModelSerializer):
+    shows=WatchListSerializer(many=True,read_only=True)
+    class Meta:
+        model=StreamPlatform
+        fields='__all__'
+
+
+
 
 
