@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from movie_app.models import Movie
+from movie_app.models import Movie,StreamPlatform,WatchList
 
 
 ##using Serializer
@@ -70,5 +70,27 @@ class MovieSerializer(serializers.ModelSerializer):
         return attrs
 
 
+"""............................................................................................................"""
+
+
+
+"""creating WatchList serializer and StreamPlatform serializer"""
+
+class StreamPlatformSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=StreamPlatform
+        fields='__all__'
+
+
+class WatchListSerializer(serializers.ModelSerializer):
+    status=serializers.SerializerMethodField() #implemented custom serializer field
+    class Meta:
+        model=WatchList
+        fields='__all__'
+
+    def get_status(self, obj):
+        if obj.active:
+            return "Running successfully!"
+        return "Not Available!"
 
 

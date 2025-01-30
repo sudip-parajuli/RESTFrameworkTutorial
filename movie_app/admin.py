@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from movie_app.models import Movie, StreamPlatform
+from movie_app.models import Movie, StreamPlatform, WatchList
 
 # Register your models here.
 admin.site.register(Movie)
 
 """registered new updated models StreamPlatform and WatchList """
-admin.site.register(['StreamPlatform','WatchList'])
+admin.site.register([StreamPlatform,WatchList])
