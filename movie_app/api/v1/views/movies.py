@@ -146,3 +146,6 @@ class movie_detail(APIView):
         movie=self.get_object(pk)
         movie.delete()
         return Response({'success':True}, status=status.HTTP_204_NO_CONTENT)
+
+
+"""..............................................................................................."""

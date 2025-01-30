@@ -10,5 +10,7 @@ urlpatterns = [
     ##for class based views
     path('list/', movie_list.as_view(), name='movie_list'),
     path('<int:pk>/', movie_detail.as_view(), name='movie_detail'),
+
+    ##
 ]
 

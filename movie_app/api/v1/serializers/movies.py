@@ -22,9 +22,18 @@ from movie_app.models import Movie
 
 # using ModelSerializer
 class MovieSerializer(serializers.ModelSerializer):
+    status=serializers.SerializerMethodField() #implemented custom serializer field
     class Meta:
         model=Movie
-        fields=['id', 'name', 'description', 'active']
+        # fields=['id', 'name', 'description', 'active']
+        fields='__all__'
+
+    def get_status(self, obj):
+        if obj.active:
+            return "Movie is running successfully!"
+        return "Not Available!"
+
+
 
     #field level validations
 
