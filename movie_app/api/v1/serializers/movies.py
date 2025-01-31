@@ -78,6 +78,7 @@ class MovieSerializer(serializers.ModelSerializer):
 
 class WatchListSerializer(serializers.ModelSerializer):
     status=serializers.SerializerMethodField() #implemented custom serializer field
+    platform = serializers.StringRelatedField()
     class Meta:
         model=WatchList
         fields='__all__'

@@ -3,8 +3,10 @@ from http.client import responses
 from django.core.serializers import serialize
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status, mixins, generics, viewsets
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView
+from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -32,7 +34,7 @@ from movie_app.models import Movie,WatchList,StreamPlatform
 #     }
 #     return JsonResponse(data)
 
-"""................................................................................................"""
+"""........................................................................................................"""
 
 
 """to create API using REST framework, function based view"""
@@ -85,7 +87,7 @@ def movie_detail(request, pk):
         movie.delete()
         return Response({'success':True})
 
-"""................................................................................."""
+"""........................................................................................................"""
 
 
 """using class based views for Movie"""
@@ -148,7 +150,7 @@ class movie_detail(APIView):
         return Response({'success':True}, status=status.HTTP_204_NO_CONTENT)
 
 
-"""..............................................................................................."""
+"""............................................................................................................."""
 
 
 
@@ -213,7 +215,8 @@ class watchlist_detail(APIView):
         return Response({'success':True}, status=status.HTTP_204_NO_CONTENT)
 
 
-"""....................................................................................."""
+"""...................................................................................."""
+
 
 class stream_platform_list(APIView):
     """
@@ -271,3 +274,85 @@ class stream_platform_detail(APIView):
         streamplatform=self.get_object(pk)
         streamplatform.delete()
         return Response({'success':True}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+"""............................................................................................................"""
+
+
+"""GenericAPIView and mixins"""
+
+class WatchlistCRUDView(mixins.ListModelMixin,CreateModelMixin,DestroyModelMixin,
+                        RetrieveModelMixin,UpdateModelMixin, generics.GenericAPIView):
+
+    queryset = WatchList.objects.all()
+    serializer_class=WatchListSerializer
+
+    def get(self,request,*args, **kwargs):
+        if 'pk' in kwargs:
+         return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
+
+
+    def post(self,request,*args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def put(self,request,*args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self,request,*args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self,request,*args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+
+"""..................................................................................................."""
+
+"""Concrete View classes"""
+
+class WatchlistView(ListAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+class WatchListDetailView(RetrieveAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+
+class WatchListUpdateView(UpdateAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+class WatchListRetrieveUpdateDeleteView(RetrieveUpdateDestroyAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+
+""".................................................................................................."""
+#overriding queryset
+
+class NetflixWatchListView(ListAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+    def get_queryset(self):
+        return WatchList.objects.filter(platform__name="Netflix")
+
+
+""".............................................................................................."""
+
+#viewsets
+
+class WatchlistViewSet(viewsets.ModelViewSet):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+class StreamPlatformViewSet(viewsets.ModelViewSet):
+    queryset = StreamPlatform.objects.all()
+    serializer_class = StreamPlatformSerializer
+
+
+
+
